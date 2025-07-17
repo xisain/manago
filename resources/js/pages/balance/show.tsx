@@ -22,12 +22,13 @@ export interface Balance {
     updated_at: string;
 }
 
-// Future transaction interface for reference
+// Transaction interface
 export interface Transaction {
     id: number;
     balance_id: number;
     type: 'income' | 'expense';
     amount: number;
+    category: string;
     description: string;
     date: string;
     created_at: string;
@@ -35,25 +36,31 @@ export interface Transaction {
 
 interface PageProps {
     balance: Balance;
+    transactions: Transaction[];
     flash: { message?: string; error?: string };
-    // transactions?: Transaction[]; // For future implementation
 }
 
-export default function BalanceShow({ balance }: PageProps) {
+export default function BalanceShow({ balance, transactions }: PageProps) {
     const breadcrumbs: BreadcrumbItem[] = [
         {
-            title: "Balance",
-            href: "/balance",
+            title: "Wallet",
+            href: "/balances",
         },
         {
             title: balance.name,
-            href: `/balance/${balance.id}`,
-        }
+            href: `/balances/${balance.id}`,
+        },
     ];
 
     const handleDelete = () => {
         if (confirm('Are you sure you want to delete this balance? This action cannot be undone.')) {
-            router.delete(route('balance.destroy', balance.id));
+            router.delete(route('balances.destroy', balance.id));
+        }
+    };
+
+    const handleDeleteTransaction = (transactionId: number) => {
+        if (confirm('Are you sure you want to delete this transaction? This action cannot be undone.')) {
+            router.delete(route('transactions.destroy', transactionId));
         }
     };
 
@@ -109,6 +116,12 @@ export default function BalanceShow({ balance }: PageProps) {
         });
     };
 
+    const getTransactionBadge = (type: 'income' | 'expense') => {
+        return type === 'income'
+            ? { color: 'bg-green-100 text-green-800 border-green-200', icon: Plus, label: 'Income' }
+            : { color: 'bg-red-100 text-red-800 border-red-200', icon: Minus, label: 'Expense' };
+    };
+
     const balanceStatus = getBalanceStatus();
     const BalanceIcon = balanceStatus.icon;
 
@@ -133,7 +146,7 @@ export default function BalanceShow({ balance }: PageProps) {
                         </div>
                     </div>
                     <div className="flex items-center gap-2">
-                        <Link href="">
+                        <Link href={route('balances.edit', balance.id)}>
                             <Button variant="outline">
                                 <Edit className="w-4 h-4 mr-2" />
                                 Edit
@@ -166,10 +179,10 @@ export default function BalanceShow({ balance }: PageProps) {
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div className="p-4 rounded-lg">
                                         <div className="flex items-center gap-2 mb-2">
-                                            <Wallet className="w-5 h-5 text-blue-600" />
-                                            <span className="text-sm font-medium text-blue-800">Current Balance</span>
+                                            <Wallet className="w-5 h-5" />
+                                            <span className="text-sm font-medium">Current Balance</span>
                                         </div>
-                                        <div className="text-2xl font-bold text-blue-900">
+                                        <div className="text-2xl font-bold">
                                             {formatCurrency(balance.current_balance)}
                                         </div>
                                     </div>
@@ -187,7 +200,7 @@ export default function BalanceShow({ balance }: PageProps) {
                             </CardContent>
                         </Card>
 
-                        {/* Recent Transactions - Placeholder for future implementation */}
+                        {/* Recent Transactions */}
                         <Card>
                             <CardHeader>
                                 <CardTitle>Recent Transactions</CardTitle>
@@ -196,13 +209,61 @@ export default function BalanceShow({ balance }: PageProps) {
                                 </CardDescription>
                             </CardHeader>
                             <CardContent>
-                                <div className="text-center py-8">
-                                    <History className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                                    <p className="text-gray-500 mb-4">No transactions recorded yet</p>
-                                    <p className="text-sm text-gray-400">
-                                        Transactions will appear here once you start recording income and expenses
-                                    </p>
-                                </div>
+                                {transactions.length === 0 ? (
+                                    <div className="text-center py-8">
+                                        <History className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                                        <p className="text-gray-500 mb-4">No transactions recorded yet</p>
+                                        <p className="text-sm text-gray-400">
+                                            Transactions will appear here once you start recording income and expenses
+                                        </p>
+                                    </div>
+                                ) : (
+                                    <div className="space-y-4">
+                                        {transactions.map((transaction) => {
+                                            const badge = getTransactionBadge(transaction.type);
+                                            const TransactionIcon = badge.icon;
+                                            return (
+                                                <div key={transaction.id} className="flex items-center justify-between p-4 border rounded-lg">
+                                                    <div className="flex items-center gap-4">
+                                                        <div>
+                                                            <Badge className={badge.color}>
+                                                                <TransactionIcon className="w-3 h-3 mr-1" />
+                                                                {badge.label}
+                                                            </Badge>
+                                                            <p className="text-sm font-medium mt-1">{transaction.category}</p>
+                                                            <p className="text-sm text-muted-foreground">
+                                                                {transaction.description || 'No description'}
+                                                            </p>
+                                                            <p className="text-sm text-muted-foreground">
+                                                                {formatDate(transaction.date)}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                    <div className="flex items-center gap-4">
+                                                        <div className="text-lg font-bold">
+                                                            {formatCurrency(transaction.amount)}
+                                                        </div>
+                                                        <div className="flex gap-2">
+                                                            <Link href={route('transactions.edit', transaction.id)}>
+                                                                <Button variant="outline" size="sm">
+                                                                    <Edit className="w-4 h-4" />
+                                                                </Button>
+                                                            </Link>
+                                                            <Button
+                                                                variant="outline"
+                                                                size="sm"
+                                                                className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
+                                                                onClick={() => handleDeleteTransaction(transaction.id)}
+                                                            >
+                                                                <Trash2 className="w-4 h-4" />
+                                                            </Button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                )}
                             </CardContent>
                         </Card>
 
@@ -291,52 +352,42 @@ export default function BalanceShow({ balance }: PageProps) {
                                 <CardTitle>Quick Actions</CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-3">
-                                <Link href="">
+                                <Link href={route('balances.edit', balance.id)}>
                                     <Button variant="outline" className="w-full justify-start">
                                         <Edit className="w-4 h-4 mr-2" />
                                         Edit Balance
                                     </Button>
                                 </Link>
 
-                                {/* Future transaction buttons */}
-                                <Button
-                                    variant="outline"
-                                    className="w-full justify-start text-green-600 hover:text-green-700 hover:bg-green-50"
-                                    onClick={() => {
-                                        // Future: Navigate to add income transaction
-                                        // router.visit(route('transactions.create', { balance_id: balance.id, type: 'income' }));
-                                        alert('Add Income feature will be implemented soon');
-                                    }}
-                                >
-                                    <Plus className="w-4 h-4 mr-2" />
-                                    Add Income
-                                </Button>
+                                <Link href={route('transactions.create', { balance_id: balance.id, type: 'income' })}>
+                                    <Button
+                                        variant="outline"
+                                        className="w-full justify-start text-green-600 hover:text-green-700 hover:bg-green-50"
+                                    >
+                                        <Plus className="w-4 h-4 mr-2" />
+                                        Add Income
+                                    </Button>
+                                </Link>
 
-                                <Button
-                                    variant="outline"
-                                    className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50"
-                                    onClick={() => {
-                                        // Future: Navigate to add expense transaction
-                                        // router.visit(route('transactions.create', { balance_id: balance.id, type: 'expense' }));
-                                        alert('Add Expense feature will be implemented soon');
-                                    }}
-                                >
-                                    <Minus className="w-4 h-4 mr-2" />
-                                    Add Expense
-                                </Button>
+                                <Link href={route('transactions.create', { balance_id: balance.id, type: 'expense' })}>
+                                    <Button
+                                        variant="outline"
+                                        className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50"
+                                    >
+                                        <Minus className="w-4 h-4 mr-2" />
+                                        Add Expense
+                                    </Button>
+                                </Link>
 
-                                <Button
-                                    variant="outline"
-                                    className="w-full justify-start"
-                                    onClick={() => {
-                                        // Future: Navigate to transactions list
-                                        // router.visit(route('transactions.index', { balance_id: balance.id }));
-                                        alert('View All Transactions feature will be implemented soon');
-                                    }}
-                                >
-                                    <History className="w-4 h-4 mr-2" />
-                                    View All Transactions
-                                </Button>
+                                <Link href={route('transactions.index', { balance_id: balance.id })}>
+                                    <Button
+                                        variant="outline"
+                                        className="w-full justify-start"
+                                    >
+                                        <History className="w-4 h-4 mr-2" />
+                                        View All Transactions
+                                    </Button>
+                                </Link>
 
                                 <Link href={route('balances.create')}>
                                     <Button variant="outline" className="w-full justify-start">

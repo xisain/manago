@@ -168,9 +168,9 @@ export const taskColumns: ColumnDef<Task>[] = [
             const task = row.original;
             const status = row.getValue('status') as string;
             const statusColors = {
-                pending: 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200',
-                in_progress: 'bg-blue-100 text-blue-800 hover:bg-blue-200',
-                completed: 'bg-green-100 text-green-800 hover:bg-green-200',
+                pending: 'bg-yellow-500 text-yellow-800 hover:bg-yellow-600',
+                in_progress: 'bg-blue-500 text-blue-800 hover:bg-blue-600',
+                completed: 'bg-green-500 text-green-800 hover:bg-green-600',
             };
 
             return (
@@ -245,9 +245,9 @@ export const taskColumns: ColumnDef<Task>[] = [
             const task = row.original;
             const priority = row.getValue('priority') as string;
             const priorityColors = {
-                low: 'bg-gray-100 text-gray-800 hover:bg-gray-200',
-                medium: 'bg-orange-100 text-orange-800 hover:bg-orange-200',
-                high: 'bg-red-100 text-red-800 hover:bg-red-200',
+                low: 'bg-gray-400 text-gray-800 hover:bg-gray-500 dark: text-white-200',
+                medium: 'bg-orange-400 text-orange-800 hover:bg-orange-400',
+                high: 'bg-red-400 text-red-800 hover:bg-red-400',
             };
 
             return (

@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\transaction;
+use App\Models\Transaction;
+use App\Models\Balance;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use Inertia\Response;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class TransactionController extends Controller
 {
@@ -15,8 +16,13 @@ class TransactionController extends Controller
      */
     public function index()
     {
-        $transactions = Transaction::all();
-        return Inertia::render('transactions/index', compact('transactions'));
+        $transactions = Transaction::with('balance.user')
+            ->orderBy('date', 'desc')
+            ->get();
+        
+        $balances = Balance::with('user')->get();
+        
+        return Inertia::render('transactions/index', compact('transactions', 'balances'));
     }
 
     /**
@@ -24,7 +30,10 @@ class TransactionController extends Controller
      */
     public function create()
     {
-        return Inertia::render('transactions/create', []);
+        $balances = Balance::with('user')->get();
+        return Inertia::render('transactions/create', [
+            'balances' => $balances
+        ]);
     }
 
     /**
@@ -32,24 +41,49 @@ class TransactionController extends Controller
      */
     public function store(Request $request)
     {
-        $user =  Auth::id();
-        $request->merge(['user_id' => $user]);
+        $user = Auth::id();
         $request->validate([
             'date' => 'required|date',
             'type' => 'required|in:income,expense',
             'category' => 'required|string',
-            'amount' => 'required|numeric',
+            'amount' => 'required|numeric|min:0',
             'description' => 'nullable|string',
-            'user_id' => 'required|exists:users,id',
+            'balance_id' => 'required|exists:balances,id',
         ]);
-        Transaction::create($request->all());
+
+        // Validate that the balance belongs to the authenticated user
+        $balance = Balance::where('id', $request->balance_id)
+            ->where('user_id', $user)
+            ->firstOrFail();
+
+        DB::transaction(function () use ($request, $balance) {
+            // Create the transaction with balance_id
+            $transaction = Transaction::create($request->only([
+                'balance_id',
+                'type',
+                'amount',
+                'category',
+                'description',
+                'date',
+            ]));
+
+            // Update balance based on transaction type
+            if ($request->type === 'expense') {
+                $balance->current_balance -= $request->amount;
+            } else {
+                $balance->current_balance += $request->amount;
+            }
+
+            $balance->save();
+        });
+
         return redirect()->route('transactions.index')->with('message', 'Transaction created successfully.');
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(transaction $transaction)
+    public function show(Transaction $transaction)
     {
         //
     }
@@ -57,7 +91,7 @@ class TransactionController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(transaction $transaction)
+    public function edit(Transaction $transaction)
     {
         //
     }
@@ -65,7 +99,7 @@ class TransactionController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, transaction $transaction)
+    public function update(Request $request, Transaction $transaction)
     {
         //
     }
@@ -73,7 +107,7 @@ class TransactionController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(transaction $transaction)
+    public function destroy(Transaction $transaction)
     {
         //
     }

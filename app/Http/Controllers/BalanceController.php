@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\balance;
+use App\Models\transaction;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Auth;
@@ -49,11 +50,23 @@ class BalanceController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(balance $balance)
+    public function show(Balance $balance)
     {
-       return Inertia::render('balance/show', [
-            'balance' => $balance
-        ]); 
+        // Ensure the balance belongs to the authenticated user
+        if ($balance->user_id !== Auth::id()) {
+            abort(403, 'Unauthorized');
+        }
+
+        // Load transactions for the balance
+        $transactions = Transaction::where('balance_id', $balance->id)
+            ->orderBy('date', 'desc')
+            ->take(5) // Limit to 5 recent transactions
+            ->get();
+
+        return Inertia::render('balance/show', [
+            'balance' => $balance,
+            'transactions' => $transactions,
+        ]);
     }
 
     /**

@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('transactions', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('balance_id');
-            $table->string('type'); // e.g., 'income', 'expense'
+            $table->enum('type',['income','expense']); 
             $table->decimal('amount', 10, 2);
             $table->string('category'); // e.g., 'food', 'transport', '
             $table->string('description')->nullable();

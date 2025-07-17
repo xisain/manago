@@ -20,9 +20,9 @@ import {
     type VisibilityState
 } from '@tanstack/react-table';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
-import { ArrowUpDown, CirclePlus, EditIcon, TrashIcon, ChevronDown, CheckCircle2Icon } from 'lucide-react';
+import { ArrowUpDown, CirclePlus, EditIcon, TrashIcon, ChevronDown, CheckCircle2Icon, Search } from 'lucide-react';
 import { useState } from 'react';
-import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
+import { Alert, AlertTitle, AlertDescription, } from '@/components/ui/alert';
 import {
     AlertDialog,
     AlertDialogTrigger,
@@ -340,57 +340,62 @@ const positiveBalances = safeBalances.filter(balance => Number(balance.current_b
                 </div>
 
                 {/* Wallets Table Section */}
-                <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                        <h1 className="text-2xl font-bold">Wallets</h1>
-                        <Link href={route('balances.create')}>
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Wallet</CardTitle>
+                        <CardDescription>Manage Your Wallet</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                     <div className="flex items-center justify-between py-4">
+                            <div className="flex items-center gap-2">
+                                <div className="relative">
+                                    <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                                    <Input
+                                        placeholder="Filter Wallet..."
+                                        value={(table.getColumn('name')?.getFilterValue() as string) ?? ''}
+                                        onChange={(event) =>
+                                            table.getColumn('name')?.setFilterValue(event.target.value)
+                                        }
+                                        className="pl-8 max-w-sm"
+                                    />
+                                </div>
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button variant="outline" className="ml-auto">
+                                            Columns <ChevronDown className="ml-2 h-4 w-4" />
+                                        </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="end">
+                                        {table
+                                            .getAllColumns()
+                                            .filter((column) => column.getCanHide())
+                                            .map((column) => {
+                                                return (
+                                                    <DropdownMenuCheckboxItem
+                                                        key={column.id}
+                                                        className="capitalize"
+                                                        checked={column.getIsVisible()}
+                                                        onCheckedChange={(value) =>
+                                                            column.toggleVisibility(!!value)
+                                                        }
+                                                    >
+                                                        {column.id}
+                                                    </DropdownMenuCheckboxItem>
+                                                );
+                                            })}
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <Link href={route('balances.create')}>
                             <Button>
                                 <CirclePlus className="mr-2 h-4 w-4" />
                                 Add Wallet
                             </Button>
                         </Link>
-                    </div>
-
-                    {/* Table Controls */}
-                    <div className="flex items-center space-x-2">
-                        <Input
-                            placeholder="Filter wallets..."
-                            value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
-                            onChange={(event) =>
-                                table.getColumn("name")?.setFilterValue(event.target.value)
-                            }
-                            className="max-w-sm"
-                        />
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button variant="outline">
-                                    Columns <ChevronDown className="ml-2 h-4 w-4" />
-                                </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                                {table
-                                    .getAllColumns()
-                                    .filter((column) => column.getCanHide())
-                                    .map((column) => {
-                                        return (
-                                            <DropdownMenuCheckboxItem
-                                                key={column.id}
-                                                className="capitalize"
-                                                checked={column.getIsVisible()}
-                                                onCheckedChange={(value) =>
-                                                    column.toggleVisibility(!!value)
-                                                }
-                                            >
-                                                {column.id}
-                                            </DropdownMenuCheckboxItem>
-                                        );
-                                    })}
-                            </DropdownMenuContent>
-                        </DropdownMenu>
-                    </div>
-
-                    {/* Table */}
-                    <div className="rounded-md border">
+                            </div>
+                        </div>
+                        <div className="rounded-md border">
                         <Table>
                             <TableHeader>
                                 {table.getHeaderGroups().map((headerGroup) => (
@@ -443,7 +448,7 @@ const positiveBalances = safeBalances.filter(balance => Number(balance.current_b
                     </div>
 
                     {/* Pagination */}
-                    <div className="flex items-center justify-between space-x-2">
+                    <div className="flex items-center justify-between space-x-2 py-4">
                         <div className="flex-1 text-sm text-muted-foreground">
                             {table.getFilteredSelectedRowModel().rows.length} of{" "}
                             {table.getFilteredRowModel().rows.length} row(s) selected.
@@ -466,9 +471,10 @@ const positiveBalances = safeBalances.filter(balance => Number(balance.current_b
                                 Next
                             </Button>
                         </div>
-                    </div>
+                    </div>   
+                    </CardContent>
+                </Card>
                 </div>
-            </div>
         </AppLayout>
     );
 }
