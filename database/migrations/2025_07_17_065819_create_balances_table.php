@@ -13,6 +13,9 @@ return new class extends Migration
     {
         Schema::create('balances', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->string('name');
+            $table->decimal('current_balance', 15, 2);
             $table->timestamps();
         });
     }

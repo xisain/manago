@@ -15,9 +15,7 @@ class TransactionController extends Controller
      */
     public function index()
     {
-        $transactions = Transaction::where('user_id', Auth::id())
-            ->orderBy('date', 'desc')
-            ->get();
+        $transactions = Transaction::all();
         return Inertia::render('transactions/index', compact('transactions'));
     }
 

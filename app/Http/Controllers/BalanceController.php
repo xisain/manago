@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\balance;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
+use Illuminate\Support\Facades\Auth;
 
 class BalanceController extends Controller
 {
@@ -12,7 +14,10 @@ class BalanceController extends Controller
      */
     public function index()
     {
-        //
+       $balances = balance::all();
+       return Inertia::render('balance/index',[
+        'balances'=> $balances
+       ]);
     }
 
     /**
@@ -20,7 +25,10 @@ class BalanceController extends Controller
      */
     public function create()
     {
-        //
+        $balances = balance::all();
+        return Inertia::render('balance/create',[
+            'balances'=>$balances
+        ]);
     }
 
     /**
@@ -28,7 +36,14 @@ class BalanceController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'name' => 'sometimes|required|string|max:255',
+            'current_balance'=> 'sometimes|required|numeric',
+        ]);
+        $validated['user_id'] = Auth::id();
+        balance::create($validated);
+        return redirect()->route('balances.index')
+            ->with('message', 'Wallet Created succesfully');
     }
 
     /**
@@ -36,7 +51,9 @@ class BalanceController extends Controller
      */
     public function show(balance $balance)
     {
-        //
+       return Inertia::render('balance/show', [
+            'balance' => $balance
+        ]); 
     }
 
     /**
