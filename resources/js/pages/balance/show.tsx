@@ -1,17 +1,11 @@
-import { Button } from "@/components/ui/button";
-import AppLayout from "@/layouts/app-layout";
-import { type BreadcrumbItem } from "@/types";
-import { Head, Link, router } from "@inertiajs/react";
-import { Edit, Trash2, Calendar, Wallet, TrendingUp, TrendingDown, DollarSign, Plus, Minus, History } from "lucide-react";
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-} from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
+import AppLayout from '@/layouts/app-layout';
+import { type BreadcrumbItem } from '@/types';
+import { Head, Link, router } from '@inertiajs/react';
+import { Calendar, DollarSign, Edit, History, Minus, Plus, Trash2, TrendingDown, TrendingUp, Wallet } from 'lucide-react';
 
 // Balance interface
 export interface Balance {
@@ -43,8 +37,8 @@ interface PageProps {
 export default function BalanceShow({ balance, transactions }: PageProps) {
     const breadcrumbs: BreadcrumbItem[] = [
         {
-            title: "Wallet",
-            href: "/balances",
+            title: 'Wallet',
+            href: '/balances',
         },
         {
             title: balance.name,
@@ -69,19 +63,19 @@ export default function BalanceShow({ balance, transactions }: PageProps) {
             return {
                 color: 'bg-green-100 text-green-800 border-green-200',
                 icon: TrendingUp,
-                label: 'Positive'
+                label: 'Positive',
             };
         } else if (balance.current_balance < 0) {
             return {
                 color: 'bg-red-100 text-red-800 border-red-200',
                 icon: TrendingDown,
-                label: 'Negative'
+                label: 'Negative',
             };
         } else {
             return {
                 color: 'bg-gray-100 text-gray-800 border-gray-200',
                 icon: DollarSign,
-                label: 'Zero'
+                label: 'Zero',
             };
         }
     };
@@ -90,7 +84,7 @@ export default function BalanceShow({ balance, transactions }: PageProps) {
         return new Intl.NumberFormat('id-ID', {
             style: 'currency',
             currency: 'IDR',
-            minimumFractionDigits: 0
+            minimumFractionDigits: 0,
         }).format(amount);
     };
 
@@ -102,7 +96,7 @@ export default function BalanceShow({ balance, transactions }: PageProps) {
             month: 'long',
             day: 'numeric',
             hour: '2-digit',
-            minute: '2-digit'
+            minute: '2-digit',
         });
     };
 
@@ -112,7 +106,7 @@ export default function BalanceShow({ balance, transactions }: PageProps) {
         return date.toLocaleDateString('id-ID', {
             year: 'numeric',
             month: 'long',
-            day: 'numeric'
+            day: 'numeric',
         });
     };
 
@@ -129,70 +123,60 @@ export default function BalanceShow({ balance, transactions }: PageProps) {
         <AppLayout breadcrumbs={breadcrumbs}>
             <div className="flex h-full flex-1 flex-col gap-6 rounded-xl p-4">
                 {/* Header */}
-                <Head title={balance.name + " - Balance"} />
+                <Head title={balance.name + ' - Balance'} />
                 <div className="flex items-start justify-between">
                     <div className="flex items-center gap-4">
                         <div>
-                            <h1 className="text-3xl font-bold mb-2">{balance.name}</h1>
+                            <h1 className="mb-2 text-3xl font-bold">{balance.name}</h1>
                             <div className="flex items-center gap-3">
                                 <Badge className={balanceStatus.color}>
-                                    <BalanceIcon className="w-3 h-3 mr-1" />
+                                    <BalanceIcon className="mr-1 h-3 w-3" />
                                     {balanceStatus.label}
                                 </Badge>
-                                <div className="text-2xl font-bold">
-                                    {formatCurrency(balance.current_balance)}
-                                </div>
+                                <div className="text-2xl font-bold">{formatCurrency(balance.current_balance)}</div>
                             </div>
                         </div>
                     </div>
                     <div className="flex items-center gap-2">
                         <Link href={route('balances.edit', balance.id)}>
                             <Button variant="outline">
-                                <Edit className="w-4 h-4 mr-2" />
+                                <Edit className="mr-2 h-4 w-4" />
                                 Edit
                             </Button>
                         </Link>
-                        <Button
-                            variant="outline"
-                            onClick={handleDelete}
-                            className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
-                        >
-                            <Trash2 className="w-4 h-4 mr-2" />
+                        <Button variant="outline" onClick={handleDelete} className="border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700">
+                            <Trash2 className="mr-2 h-4 w-4" />
                             Delete
                         </Button>
                     </div>
                 </div>
 
                 {/* Main Content */}
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
                     {/* Balance Details */}
-                    <div className="lg:col-span-2 space-y-6">
+                    <div className="space-y-6 lg:col-span-2">
                         {/* Balance Overview */}
                         <Card>
                             <CardHeader>
                                 <CardTitle>Balance Overview</CardTitle>
-                                <CardDescription>
-                                    Current financial status of {balance.name}
-                                </CardDescription>
+                                <CardDescription>Current financial status of {balance.name}</CardDescription>
                             </CardHeader>
                             <CardContent>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div className="p-4 rounded-lg">
-                                        <div className="flex items-center gap-2 mb-2">
-                                            <Wallet className="w-5 h-5" />
+                                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                                    <div className="rounded-lg p-4">
+                                        <div className="mb-2 flex items-center gap-2">
+                                            <Wallet className="h-5 w-5" />
                                             <span className="text-sm font-medium">Current Balance</span>
                                         </div>
-                                        <div className="text-2xl font-bold">
-                                            {formatCurrency(balance.current_balance)}
-                                        </div>
+                                        <div className="text-2xl font-bold">{formatCurrency(balance.current_balance)}</div>
                                     </div>
-                                    <div className="p-4 rounded-lg">
-                                        <div className="flex items-center gap-2 mb-2">
-                                            <History className="w-5 h-5 text-gray-600" />
+                                    <div className="rounded-lg p-4">
+                                        <div className="mb-2 flex items-center gap-2">
+                                            <History className="h-5 w-5 text-gray-600" />
                                             <span className="text-sm font-medium text-gray-800">Status</span>
                                         </div>
                                         <Badge className={balanceStatus.color}>
-                                            <BalanceIcon className="w-3 h-3 mr-1" />
+                                            <BalanceIcon className="mr-1 h-3 w-3" />
                                             {balanceStatus.label}
                                         </Badge>
                                     </div>
@@ -204,15 +188,13 @@ export default function BalanceShow({ balance, transactions }: PageProps) {
                         <Card>
                             <CardHeader>
                                 <CardTitle>Recent Transactions</CardTitle>
-                                <CardDescription>
-                                    Latest financial activities for this balance
-                                </CardDescription>
+                                <CardDescription>Latest financial activities for this balance</CardDescription>
                             </CardHeader>
                             <CardContent>
                                 {transactions.length === 0 ? (
-                                    <div className="text-center py-8">
-                                        <History className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                                        <p className="text-gray-500 mb-4">No transactions recorded yet</p>
+                                    <div className="py-8 text-center">
+                                        <History className="mx-auto mb-4 h-12 w-12 text-gray-400" />
+                                        <p className="mb-4 text-gray-500">No transactions recorded yet</p>
                                         <p className="text-sm text-gray-400">
                                             Transactions will appear here once you start recording income and expenses
                                         </p>
@@ -223,39 +205,35 @@ export default function BalanceShow({ balance, transactions }: PageProps) {
                                             const badge = getTransactionBadge(transaction.type);
                                             const TransactionIcon = badge.icon;
                                             return (
-                                                <div key={transaction.id} className="flex items-center justify-between p-4 border rounded-lg">
+                                                <div key={transaction.id} className="flex items-center justify-between rounded-lg border p-4">
                                                     <div className="flex items-center gap-4">
                                                         <div>
                                                             <Badge className={badge.color}>
-                                                                <TransactionIcon className="w-3 h-3 mr-1" />
+                                                                <TransactionIcon className="mr-1 h-3 w-3" />
                                                                 {badge.label}
                                                             </Badge>
-                                                            <p className="text-sm font-medium mt-1">{transaction.category}</p>
+                                                            <p className="mt-1 text-sm font-medium">{transaction.category}</p>
                                                             <p className="text-sm text-muted-foreground">
                                                                 {transaction.description || 'No description'}
                                                             </p>
-                                                            <p className="text-sm text-muted-foreground">
-                                                                {formatDate(transaction.date)}
-                                                            </p>
+                                                            <p className="text-sm text-muted-foreground">{formatDate(transaction.date)}</p>
                                                         </div>
                                                     </div>
                                                     <div className="flex items-center gap-4">
-                                                        <div className="text-lg font-bold">
-                                                            {formatCurrency(transaction.amount)}
-                                                        </div>
+                                                        <div className="text-lg font-bold">{formatCurrency(transaction.amount)}</div>
                                                         <div className="flex gap-2">
                                                             <Link href={route('transactions.edit', transaction.id)}>
                                                                 <Button variant="outline" size="sm">
-                                                                    <Edit className="w-4 h-4" />
+                                                                    <Edit className="h-4 w-4" />
                                                                 </Button>
                                                             </Link>
                                                             <Button
                                                                 variant="outline"
                                                                 size="sm"
-                                                                className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
+                                                                className="border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700"
                                                                 onClick={() => handleDeleteTransaction(transaction.id)}
                                                             >
-                                                                <Trash2 className="w-4 h-4" />
+                                                                <Trash2 className="h-4 w-4" />
                                                             </Button>
                                                         </div>
                                                     </div>
@@ -271,29 +249,23 @@ export default function BalanceShow({ balance, transactions }: PageProps) {
                         <Card>
                             <CardHeader>
                                 <CardTitle>Balance History</CardTitle>
-                                <CardDescription>
-                                    Creation and modification timeline
-                                </CardDescription>
+                                <CardDescription>Creation and modification timeline</CardDescription>
                             </CardHeader>
                             <CardContent>
                                 <div className="space-y-4">
                                     <div className="flex items-center gap-3">
-                                        <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                                        <div className="h-2 w-2 rounded-full bg-blue-500"></div>
                                         <div>
                                             <p className="text-sm font-medium">Balance Created</p>
-                                            <p className="text-sm text-muted-foreground">
-                                                {formatDate(balance.created_at)}
-                                            </p>
+                                            <p className="text-sm text-muted-foreground">{formatDate(balance.created_at)}</p>
                                         </div>
                                     </div>
                                     {balance.created_at !== balance.updated_at && (
                                         <div className="flex items-center gap-3">
-                                            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                                            <div className="h-2 w-2 rounded-full bg-green-500"></div>
                                             <div>
                                                 <p className="text-sm font-medium">Last Updated</p>
-                                                <p className="text-sm text-muted-foreground">
-                                                    {formatDate(balance.updated_at)}
-                                                </p>
+                                                <p className="text-sm text-muted-foreground">{formatDate(balance.updated_at)}</p>
                                             </div>
                                         </div>
                                     )}
@@ -311,37 +283,31 @@ export default function BalanceShow({ balance, transactions }: PageProps) {
                             </CardHeader>
                             <CardContent className="space-y-4">
                                 <div>
-                                    <div className="flex items-center gap-2 mb-2">
-                                        <Wallet className="w-4 h-4" />
+                                    <div className="mb-2 flex items-center gap-2">
+                                        <Wallet className="h-4 w-4" />
                                         <span className="text-sm font-medium">Current Amount</span>
                                     </div>
-                                    <div className="text-lg font-bold">
-                                        {formatCurrency(balance.current_balance)}
-                                    </div>
+                                    <div className="text-lg font-bold">{formatCurrency(balance.current_balance)}</div>
                                 </div>
 
                                 <Separator />
 
                                 <div>
-                                    <div className="flex items-center gap-2 mb-2">
-                                        <BalanceIcon className="w-4 h-4" />
+                                    <div className="mb-2 flex items-center gap-2">
+                                        <BalanceIcon className="h-4 w-4" />
                                         <span className="text-sm font-medium">Status</span>
                                     </div>
-                                    <Badge className={balanceStatus.color}>
-                                        {balanceStatus.label}
-                                    </Badge>
+                                    <Badge className={balanceStatus.color}>{balanceStatus.label}</Badge>
                                 </div>
 
                                 <Separator />
 
                                 <div>
-                                    <div className="flex items-center gap-2 mb-2">
-                                        <Calendar className="w-4 h-4" />
+                                    <div className="mb-2 flex items-center gap-2">
+                                        <Calendar className="h-4 w-4" />
                                         <span className="text-sm font-medium">Last Updated</span>
                                     </div>
-                                    <p className="text-sm text-gray-700">
-                                        {formatDateOnly(balance.updated_at)}
-                                    </p>
+                                    <p className="text-sm text-gray-700">{formatDateOnly(balance.updated_at)}</p>
                                 </div>
                             </CardContent>
                         </Card>
@@ -352,59 +318,67 @@ export default function BalanceShow({ balance, transactions }: PageProps) {
                                 <CardTitle>Quick Actions</CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-3">
-                                <Link href={route('balances.edit', balance.id)}>
-                                    <Button variant="outline" className="w-full justify-start">
-                                        <Edit className="w-4 h-4 mr-2" />
-                                        Edit Balance
-                                    </Button>
-                                </Link>
+                                <div>
+                                    <Link href={route('balances.edit', balance.id)}>
+                                        <Button variant="outline" className="w-full justify-start">
+                                            <Edit className="mr-2 h-4 w-4" />
+                                            Edit Balance
+                                        </Button>
+                                    </Link>
+                                </div>
 
-                                <Link href={route('transactions.create', { balance_id: balance.id, type: 'income' })}>
+                                <div>
+                                    <Link href={route('transactions.create', { balance_id: balance.id, type: 'income' })}>
+                                        <Button
+                                            variant="outline"
+                                            className="w-full justify-start text-green-600 hover:bg-green-50 hover:text-green-700"
+                                        >
+                                            <Plus className="mr-2 h-4 w-4" />
+                                            Add Income
+                                        </Button>
+                                    </Link>
+                                </div>
+
+                                <div>
+                                    <Link href={route('transactions.create', { balance_id: balance.id, type: 'expense' })}>
+                                        <Button variant="outline" className="w-full justify-start text-red-600 hover:bg-red-50 hover:text-red-700">
+                                            <Minus className="mr-2 h-4 w-4" />
+                                            Add Expense
+                                        </Button>
+                                    </Link>
+                                </div>
+
+                                <div>
+                                    <Link href={route('transactions.index', { balance_id: balance.id })}>
+                                        <Button variant="outline" className="w-full justify-start">
+                                            <History className="mr-2 h-4 w-4" />
+                                            View All Transactions
+                                        </Button>
+                                    </Link>
+                                </div>
+
+                                <div>
+                                    <Link href={route('balances.create')}>
+                                        <Button variant="outline" className="w-full justify-start">
+                                            Create New Balance
+                                        </Button>
+                                    </Link>
+                                </div>
+
+                                <div>
+                                    <hr />
+                                </div>
+
+                                <div>
                                     <Button
                                         variant="outline"
-                                        className="w-full justify-start text-green-600 hover:text-green-700 hover:bg-green-50"
+                                        className="w-full justify-start text-red-600 hover:bg-red-50 hover:text-red-700"
+                                        onClick={handleDelete}
                                     >
-                                        <Plus className="w-4 h-4 mr-2" />
-                                        Add Income
+                                        <Trash2 className="mr-2 h-4 w-4" />
+                                        Delete Balance
                                     </Button>
-                                </Link>
-
-                                <Link href={route('transactions.create', { balance_id: balance.id, type: 'expense' })}>
-                                    <Button
-                                        variant="outline"
-                                        className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50"
-                                    >
-                                        <Minus className="w-4 h-4 mr-2" />
-                                        Add Expense
-                                    </Button>
-                                </Link>
-
-                                <Link href={route('transactions.index', { balance_id: balance.id })}>
-                                    <Button
-                                        variant="outline"
-                                        className="w-full justify-start"
-                                    >
-                                        <History className="w-4 h-4 mr-2" />
-                                        View All Transactions
-                                    </Button>
-                                </Link>
-
-                                <Link href={route('balances.create')}>
-                                    <Button variant="outline" className="w-full justify-start">
-                                        Create New Balance
-                                    </Button>
-                                </Link>
-
-                                <Separator />
-
-                                <Button
-                                    variant="outline"
-                                    className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50"
-                                    onClick={handleDelete}
-                                >
-                                    <Trash2 className="w-4 h-4 mr-2" />
-                                    Delete Balance
-                                </Button>
+                                </div>
                             </CardContent>
                         </Card>
 
@@ -414,29 +388,29 @@ export default function BalanceShow({ balance, transactions }: PageProps) {
                                 <CardTitle>Balance Information</CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-3">
-                                <div className="flex justify-between items-center">
+                                <div className="flex items-center justify-between">
                                     <span className="text-sm text-muted-foreground">Balance ID</span>
                                     <span className="text-sm font-medium">#{balance.id}</span>
                                 </div>
-                                <div className="flex justify-between items-center">
+                                <div className="flex items-center justify-between">
                                     <span className="text-sm text-muted-foreground">Created</span>
-                                    <span className="text-sm font-medium">
-                                        {new Date(balance.created_at).toLocaleDateString('id-ID')}
-                                    </span>
+                                    <span className="text-sm font-medium">{new Date(balance.created_at).toLocaleDateString('id-ID')}</span>
                                 </div>
-                                <div className="flex justify-between items-center">
+                                <div className="flex items-center justify-between">
                                     <span className="text-sm text-muted-foreground">Updated</span>
-                                    <span className="text-sm font-medium">
-                                        {new Date(balance.updated_at).toLocaleDateString('id-ID')}
-                                    </span>
+                                    <span className="text-sm font-medium">{new Date(balance.updated_at).toLocaleDateString('id-ID')}</span>
                                 </div>
-                                <div className="flex justify-between items-center">
+                                <div className="flex items-center justify-between">
                                     <span className="text-sm text-muted-foreground">Balance</span>
-                                    <span className={`text-sm font-medium ${
-                                        balance.current_balance > 0 ? 'text-green-600' : 
-                                        balance.current_balance < 0 ? 'text-red-600' : 
-                                        'text-gray-600'
-                                    }`}>
+                                    <span
+                                        className={`text-sm font-medium ${
+                                            balance.current_balance > 0
+                                                ? 'text-green-600'
+                                                : balance.current_balance < 0
+                                                  ? 'text-red-600'
+                                                  : 'text-gray-600'
+                                        }`}
+                                    >
                                         {formatCurrency(balance.current_balance)}
                                     </span>
                                 </div>

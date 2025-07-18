@@ -33,10 +33,12 @@ export interface Balance {
 
 interface PageProps {
     balances: Balance[];
+    selectedBalanceId: string | null;
+    type: "income" | "expense";
     flash: { message?: string; error?: string };
 }
 
-export default function TransactionCreate({ balances }: PageProps) {
+export default function TransactionCreate({ balances, selectedBalanceId, type }: PageProps) {
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: "Balance",
@@ -49,21 +51,24 @@ export default function TransactionCreate({ balances }: PageProps) {
     ];
 
     const { data, setData, post, processing, errors } = useForm({
-        balance_id: "",
-        type: "income" as "income" | "expense",
+        balance_id: selectedBalanceId ?? "", // Pre-select balance from query param
+        type: type ?? "income", // Pre-select type from query param, default to "income"
         amount: "",
         category: "",
         description: "",
         date: new Date().toISOString().split("T")[0], // Default to today
     });
 
+    // Ensure selectedBalanceId is valid
+    useEffect(() => {
+        if (selectedBalanceId && !balances.some((b) => b.id.toString() === selectedBalanceId)) {
+            setData("balance_id", ""); // Reset if invalid
+        }
+    }, [selectedBalanceId, balances]);
+
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        post(route("transactions.store"), {
-            onSuccess: () => {
-                router.visit(route("transactions.index"));
-            },
-        });
+        post(route("transactions.store"));
     };
 
     const formatCurrency = (amount: number | string) => {
@@ -76,7 +81,6 @@ export default function TransactionCreate({ balances }: PageProps) {
         }).format(num);
     };
 
-    // Update amount display as currency
     const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value.replace(/[^0-9]/g, ""); // Allow only numbers
         setData("amount", value);
@@ -163,8 +167,8 @@ export default function TransactionCreate({ balances }: PageProps) {
                                             placeholder="Enter amount"
                                             value={data.amount ? formatCurrency(data.amount) : ""}
                                             onChange={handleAmountChange}
-                                            onFocus={(e) => e.target.value = data.amount} // Show raw number on focus
-                                            onBlur={(e) => e.target.value = formatCurrency(data.amount)} // Format as currency on blur
+                                            onFocus={(e) => (e.target.value = data.amount)} // Show raw number on focus
+                                            onBlur={(e) => (e.target.value = formatCurrency(data.amount))} // Format as currency on blur
                                         />
                                         {errors.amount && (
                                             <p className="text-sm text-red-600">{errors.amount}</p>

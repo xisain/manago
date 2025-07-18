@@ -5,6 +5,9 @@ use Inertia\Inertia;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\BalanceController;
+use App\Http\Controllers\JournalController;
+use App\Http\Controllers\WishlistController;
+
 
 Route::get('/', function () {
     return Inertia::render('welcome');
@@ -32,7 +35,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/balances/{balance}/edit', [BalanceController::class, 'edit'])->name('balances.edit');
     Route::patch('/balances/{balance}', [BalanceController::class, 'update'])->name('balances.update');
     Route::delete('/balances/{balance}', [BalanceController::class, 'destroy'])->name('balances.destroy');
-
+    // Routing Transaction 
     Route::get('/transactions', [TransactionController::class, 'index'])->name('transactions.index');
     Route::get('/transactions/create', [TransactionController::class, 'create'])->name('transactions.create');
     Route::post('/transactions', [TransactionController::class, 'store'])->name('transactions.store');
@@ -40,6 +43,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/transactions/{transaction}/edit', [TransactionController::class, 'edit'])->name('transactions.edit');
     Route::patch('/transactions/{transaction}', [TransactionController::class, 'update'])->name('transactions.update');
     Route::delete('/transactions/{transaction}', [TransactionController::class, 'destroy'])->name('transactions.destroy');
+    Route::post('/transactions/bulk-delete', [TransactionController::class, 'bulkDelete'])->name('transactions.bulkDelete');
+
+    Route::get('/journals',[JournalController::class, 'index'])->name('journals.index');
+
+    Route::get('/wishlists',[WishlistController::class, 'index'])->name('wishlists.index');
 });
 
 require __DIR__.'/settings.php';

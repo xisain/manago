@@ -7,6 +7,7 @@ use App\Models\transaction;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Auth;
+use App\Models\user;
 
 class BalanceController extends Controller
 {
@@ -15,7 +16,7 @@ class BalanceController extends Controller
      */
     public function index()
     {
-       $balances = balance::all();
+       $balances = Balance::where('user_id', Auth::id())->get();
        return Inertia::render('balance/index',[
         'balances'=> $balances
        ]);
@@ -74,7 +75,10 @@ class BalanceController extends Controller
      */
     public function edit(balance $balance)
     {
-        //
+         
+        return Inertia::render('balance/edit',[
+            'balances'=>$balance
+        ]);
     }
 
     /**
@@ -90,6 +94,7 @@ class BalanceController extends Controller
      */
     public function destroy(balance $balance)
     {
-        //
+        $balance->delete();
+        return redirect()->route('balances.index')->with('message','Wallet Deleted');
     }
 }

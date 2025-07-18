@@ -19,7 +19,7 @@ export default function TasksCreate(){
     const { data, setData, post, processing, errors } = useForm({
         title: '',
         description: '',
-        due_date: '',
+        due_date: new Date().toISOString().split("T")[0], // Default to today
         priority: '',
         status: ''
     });

@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Validator;
 
 class TransactionController extends Controller
 {
@@ -28,11 +29,15 @@ class TransactionController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(Request $request)
     {
         $balances = Balance::with('user')->get();
+        $balanceId = $request->query('balance_id');
+        $type = $request->query('type', 'expense');
         return Inertia::render('transactions/create', [
-            'balances' => $balances
+            'balances' => $balances,
+            'selectedBalanceId' => $balanceId,
+            'type' => $type,
         ]);
     }
 
@@ -109,6 +114,26 @@ class TransactionController extends Controller
      */
     public function destroy(Transaction $transaction)
     {
-        //
+        $transaction->delete();
+        return redirect()->route('transactions.index')->with('message', 'Transaction Deleted');
+    }
+      public function bulkDelete(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'ids' => 'required|array|min:1',
+            'ids.*' => 'required|exists:transactions,id'
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->back()->with('error',$validator)->withInput();
+        }
+
+        try {
+            Transaction::whereIn('id', $request->ids)->delete();
+            
+            return redirect()->route('transactions.index')->with('message', 'Transaction Deleted');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Error deleting transactions');
+        }
     }
 }

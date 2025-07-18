@@ -4,8 +4,9 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid, Wallet, ListTodo, ChartLine } from 'lucide-react';
+import { BookOpen, Folder, LayoutGrid, Wallet, ListTodo, ChartLine, ShoppingCart, Bot } from 'lucide-react';
 import AppLogo from './app-logo';
+import { NavSecondary } from './nav-secondary';
 
 const mainNavItems: NavItem[] = [
     {
@@ -16,6 +17,7 @@ const mainNavItems: NavItem[] = [
     {
         title: 'Wallet',
         href: '/balances',
+
         icon: Wallet,
     },
     {
@@ -24,10 +26,30 @@ const mainNavItems: NavItem[] = [
         icon: ChartLine,
     },
     {
+        title: 'Wishlist',
+        href: '/wishlists',
+        icon: ShoppingCart,
+    },
+
+
+];
+
+const secondNav: NavItem[] = [
+    {
         title: 'Tasks',
         href: '/tasks',
         icon: ListTodo,
-    }
+    },
+    {
+        title: 'Journal',
+        href: '/journals',
+        icon: BookOpen,
+    },
+    {
+        title: 'Ask AI',
+        href: '/askai',
+        icon: Bot,
+    },
 ];
 
 const footerNavItems: NavItem[] = [
@@ -40,7 +62,7 @@ const footerNavItems: NavItem[] = [
 
 export function AppSidebar() {
     return (
-        <Sidebar collapsible="icon" variant="sidebar">
+        <Sidebar collapsible="icon" variant="inset">
             <SidebarHeader>
                 <SidebarMenu>
                     <SidebarMenuItem>
@@ -55,6 +77,7 @@ export function AppSidebar() {
 
             <SidebarContent>
                 <NavMain items={mainNavItems} />
+                <NavSecondary items={secondNav}/>
             </SidebarContent>
 
             <SidebarFooter>
